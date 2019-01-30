@@ -1,1 +1,1 @@
-Documentation for the "Scala with Explicit Nulls" project (https://github.com/abeln/explicit-null-docs.git)
+Documentation for the "Scala with Explicit Nulls" project (https://github.com/abeln/dotty/wiki/scala-with-explicit-nulls)
