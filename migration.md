@@ -82,8 +82,7 @@ However, we will add additional ways to create arrays _soundly_.
 In total, there are currently >= 5 ways to create arrays
 ```
 new Array[String](10) 		// unsound
-new Array[String|Null](10) 	// sound
-Array.ofDim(10)			// unsound
+Array.ofDim[String](10)		// unsound
 Array.apply("hello", "world") 	// sound
 Array.fill(10)(_ => "default")	// sound
 ```
@@ -91,9 +90,12 @@ Array.fill(10)(_ => "default")	// sound
 We propose adding two additional ways to create arrays soundly (names are tentative):
 ```
 object Array {
-  def ofNulls[T >: Null <: AnyRef|Null](dim: Int): Array[T|Null]	// sound
-  def ofZeros[T <: AnyVal](dim: Int): Array[T]  			// sound
+  def ofNulls[T >: Null <: AnyRef|Null](dim: Int): Array[T|Null]
+  def ofZeros[T <: AnyVal](dim: Int): Array[T]  
 }
+
+Array.ofNulls[String](10): Array[String|Null]	// sound
+Array.ofZeros[Boolean](10): Array[Boolean]	// sound
 ```
 
 The above is sound because in the `AnyVal` case we know that `T` will erase to a value
