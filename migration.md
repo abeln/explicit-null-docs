@@ -102,3 +102,7 @@ The above is sound because in the `AnyVal` case we know that `T` will erase to a
 type.
 
 This is similar to `arrayOfNulls` in Kotlin: https://kotlinlang.org/docs/reference/basic-types.html#arrays
+
+## Java Imports
+
+A list of Java imports in the Dotty community build, sorted by frequency: https://gist.github.com/abeln/e7db55878014f27c90d1dfd2f5dc984e
