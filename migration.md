@@ -91,7 +91,12 @@ Array.fill(10)(_ => "default")	// sound
 We propose adding two additional ways to create arrays soundly (names are tentative):
 ```
 object Array {
-  def ofNulls[T >: Null <: AnyRef|Null](dim: Int): Array[T|Null]
-  def ofZeros[T <: AnyVal](dim: Int): Array[T]  
+  def ofNulls[T >: Null <: AnyRef|Null](dim: Int): Array[T|Null]	// sound
+  def ofZeros[T <: AnyVal](dim: Int): Array[T]  			// sound
 }
 ```
+
+The above is sound because in the `AnyVal` case we know that `T` will erase to a value
+type.
+
+This is similar to `arrayOfNulls` in Kotlin: https://kotlinlang.org/docs/reference/basic-types.html#arrays
