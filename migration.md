@@ -106,3 +106,28 @@ This is similar to `arrayOfNulls` in Kotlin: https://kotlinlang.org/docs/referen
 ## Java Imports
 
 A list of Java imports in the Dotty community build, sorted by frequency: https://gist.github.com/abeln/e7db55878014f27c90d1dfd2f5dc984e
+
+## Ignore Nulls in Overrides
+
+After we added a flag to gate the explicit nulls feature, we noticed that some updated tests no longer pass when the feature
+is off. There are a couple of kinds of tests changes that weren't backwards-compatible, but one large class is due to overriding.
+
+The problem is that currently `Null` is meaningful when doing override checks:
+```scala
+class Foo {
+  String foo() {}
+}
+
+class Bar extends Foo {
+  override def foo(): String|Null // error: can't override String with String|Null
+}
+```
+
+This will be a problem because if library `A` depends on `B` throw overrides, then 
+`A` can't be updated to explicit nulls until `B` is.
+
+### Proposed Solution
+
+Ignore `| Null` when doing override checks. Instead, if the override is unsound (e.g. 
+`String|Null` overrides `String` in a covariant position, or the other way around for contravariant positions),
+issue a warning.
