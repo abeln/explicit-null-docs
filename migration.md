@@ -123,7 +123,7 @@ class Bar extends Foo {
 }
 ```
 
-This will be a problem because if library `A` depends on `B` throw overrides, then 
+This will be a problem because if library `A` depends on `B` through overrides, then 
 `A` can't be updated to explicit nulls until `B` is.
 
 ### Proposed Solution
