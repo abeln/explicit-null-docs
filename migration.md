@@ -131,3 +131,19 @@ This will be a problem because if library `A` depends on `B` through overrides, 
 Ignore `| Null` when doing override checks. Instead, if the override is unsound (e.g. 
 `String|Null` overrides `String` in a covariant position, or the other way around for contravariant positions),
 issue a warning.
+
+## Uninitialized Fields and Local Variables (the Underscore)
+
+For now we decided to allow `_` both in fields and local variables, to indicate that they're uninitialized.
+
+e.g.
+```
+class Foo {
+  var x: String = _ 		// allowed but unsound
+  def bar(): Unit = {
+    var loc: String = _ 	// allowed but unsound
+  }
+}
+```
+
+TODO: bring up examples that motivate this from https://github.com/abeln/collection-strawman/pull/1
