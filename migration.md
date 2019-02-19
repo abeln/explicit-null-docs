@@ -147,3 +147,52 @@ class Foo {
 ```
 
 TODO: bring up examples that motivate this from https://github.com/abeln/collection-strawman/pull/1
+
+## Non local control flow and blocks
+
+We sometimes see code that looks like
+
+```scala
+def foo(x: String|Null): Boolean = {
+  if (x == null) return false
+  // do stuff with x knowing that it's non-null
+  val len = x.length  
+}
+```
+
+For an example, see https://github.com/abeln/dotty/blob/explicit-null/tests/pos/rbtree.scala#L250
+
+The general pattern is handling the null case early on in the function, followed by a non-local jump
+of control: e.g. a `return` or throwing an exception.
+
+### Proposed Solution
+
+Add support for the idiom above in the flow-sensitive type inference.
+
+More formally, let `s1, s2, ..., sn` be a block of consecutive statements. Now suppose statement
+`si` is of the form:
+  - `If(cond, then, else)`
+
+Then we can compute `(ifTrue, ifFalse)`, the set of non-nullability facts that hold if `cond` is
+true/false, respectively.
+
+Now define a notion of `non-local` expression:
+  - a return is a non-local expression
+  - an expression with type `Nothing` is non-local (this includes applications of the `throw` builtin) 
+  - a block is non-local if its last expression is
+  - no other expressions are non-local
+
+Consider what happens when `nonLocal(then)` holds. Then we know that for `s_{i + 1}` to execute, the
+condition must have been false, for if the condition were true, then the `then` expression would execute.
+But `then` is non-local, so `s_{i + 1}` would not execute (a contradiction).
+
+This means that if `nonLocal(then)` holds, then we can propagate the `ifFalse` facts to the context
+under which `s_{i + 1}` is typed.
+
+The algorithm for blocks is thus:
+  - if `then` and `else` are both non-local, propagate `ifTrue ++ ifFalse`
+  - if only `then` is non-local, propagate `ifFalse`
+  - if only `else` is non-local, propagate `ifTrue`
+  - if neither branch is non-local, propagate the empty set of facts (no information)
+
+See https://github.com/abeln/dotty/commit/f0bc0e5b6d5276dbc4ed7489cac5124bcbfcd5f1 for supported cases.
