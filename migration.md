@@ -165,8 +165,28 @@ For an example, see https://github.com/abeln/dotty/blob/explicit-null/tests/pos/
 The general pattern is handling the null case early on in the function, followed by a non-local jump
 of control: e.g. a `return` or throwing an exception.
 
-### Proposed Solution
+### Proposed Solution (UNSOUND)
 
+*NOTE*: the approach below is unsound, as shown by
+
+```scala
+class Foo {
+  def foo(): Unit = {
+    val x: String|Null = ???
+    g.length
+    if (x == null) return ()
+    def g: String = x // executes _before_ the test above is evaluated
+    ()
+  }
+}
+```
+
+The problem is that if s1 and s2 are consecutive statements in a block, it is _not_
+always the case that s1 must evaluate _before_ s2. For example, if s2 is a `def`, or a `lazy val`
+then a statement s0 that appears earlier in the block can cause s2 to execute without s1 executing
+(as in the example above).
+
+---
 Add support for the idiom above in the flow-sensitive type inference.
 
 More formally, let `s1, s2, ..., sn` be a block of consecutive statements. Now suppose statement
