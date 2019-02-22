@@ -216,3 +216,54 @@ The algorithm for blocks is thus:
   - if neither branch is non-local, propagate the empty set of facts (no information)
 
 See https://github.com/abeln/dotty/commit/f0bc0e5b6d5276dbc4ed7489cac5124bcbfcd5f1 for supported cases.
+
+## A sound solution for blocks
+
+We can modify the inference for blocks described in the section above to get back soundness.
+
+The idea is to not propagate flow facts to `defs` and `lazy vals`, but propagate them to `vals`.
+
+So this works
+```scala
+val x: String|Null = ???
+if (x == null) throw new NPE()
+val y: String = x // x: String inferred
+```
+but this doesn't
+```scala
+val x: String|Null = ???
+if (x == null) throw new NPE()
+def y: String = x // x: String|Null
+```
+
+Notice, though, that we only restrict facts coming from the _inner_ block.
+Facts from outer blocks are still propagated.
+
+e.g.
+```scala
+val x: String|Null = ???
+if (x != null) {
+  def y: String = x // ok; x: String inferred
+}
+```
+
+## A new type of completer
+
+Related to the topic of flow inference within blocks, we have the following problem,
+ caused by definitions generating completers, and completers using the creation context
+for completion.
+
+```scala
+val x: String|Null = ???
+if (x == null) throw NPE
+val y = x // y: String|Null inferred
+```
+
+The reason is that if `y` is completed with its creation context, then it won't know
+that `x` is non-null (because the creation context is built _before_ we type the if statement.
+
+The solution is to create a new kind of Completer that uses the current context.
+This new Completer is used for local (inside a method) definitions that are `vals`,
+but not `defs` or `lazy vals`.
+
+It's safe to use this new kind of Completer because local definitions will be forced as soon as the corresponding block is typed.
