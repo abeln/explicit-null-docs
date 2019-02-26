@@ -318,3 +318,9 @@ val x: Array[String] = (??? : Array[String|Null]) // error: Array is invariant
 See https://github.com/abeln/collection-strawman/commit/a970e293551b2fdd4111e56f1b272d8276cce769
 for an example of how we migrated `TrieMap` with minimal changes after the import.
 
+## Array.copyOf
+
+We added a new copyOf method that can handle non-nullable Arrays.
+Otherwise, the user needs to use java.util.arrays.copyOf, which takes and returns an `Array[T|Null]`.
+
+This is useful in e.g. HashMap and HashSet from collection-strawman.
