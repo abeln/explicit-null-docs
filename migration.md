@@ -267,3 +267,54 @@ This new Completer is used for local (inside a method) definitions that are `val
 but not `defs` or `lazy vals`.
 
 It's safe to use this new kind of Completer because local definitions will be forced as soon as the corresponding block is typed.
+
+## Implicit Nulls (backwards compat mode)
+
+Sometimes migrating a file to use explicit nulls is not straightforward. See `TrieMap` in collections-strawman for an example
+https://github.com/abeln/collection-strawman/blob/a970e293551b2fdd4111e56f1b272d8276cce769/collections/src/main/scala/strawman/collection/concurrent/TrieMap.scala
+
+TrieMap is a 1000 line file that interacts with Java, uses null for efficiency, and has concurrent logic.
+Determining what should or shouldn't be null within it requires domain-specific knowledge (e.g. what fields did the author intend to make non-null?)
+that we lack.
+
+In general, when porting their project to explicit nulls, a user might want to migrate only part of the project initially,
+and then gradually migrate others. Or a user might want to avoid migrating a specific file because it's tricky, but not
+want to block the _entire_ migration on that one file.
+
+### Proposed Solution
+
+We created a "backward compatibily" mode for our feature. This mode is invoked via a language import,
+and can be used to reduce (significantly, but not entirely) the burden of migrating to explicit nulls.
+
+Of course, the backwards compat mode is unsound in that it allows certain non-nullable types to contain null.
+
+So really this is something that should be used during a migration, but eventually removed.
+And it's not intended to be used with new code.
+
+Example
+```
+import scala.language.implicitNulls
+val x: String|Null = ???
+val y: String = x // turns into `val y: String = x.asInstanceOf[String]`
+val y2: String = null // turns into `val y2: String = null.asInstanceOf[String]`
+```
+
+As the example shows, the import enables the following two implicit conversions (these are special conversions
+implemented in the compiler, not real implicit conversions):
+
+1) if `tree` has type `Null` and the prototype has a reference type S, then `tree` becomes `tree.asInstanceOf[S]`
+2) if `tree` has type `S|Null` and the prototype has type `S`, then `tree` becomes `tree.asInstanceOf[S]`
+
+_Note_: this will not fix every error triggered by explicit nulls. For example, if we have
+```
+val x: String|Null = ???
+x.length // error: selection on nullable union
+```
+and
+```
+val x: Array[String] = (??? : Array[String|Null]) // error: Array is invariant
+```
+
+See https://github.com/abeln/collection-strawman/commit/a970e293551b2fdd4111e56f1b272d8276cce769
+for an example of how we migrated `TrieMap` with minimal changes after the import.
+
