@@ -324,3 +324,45 @@ We added a new copyOf method that can handle non-nullable Arrays.
 Otherwise, the user needs to use java.util.arrays.copyOf, which takes and returns an `Array[T|Null]`.
 
 This is useful in e.g. HashMap and HashSet from collection-strawman.
+
+## Integration with Checker Framework
+
+Many methods and fields in the Java jdk use reference types, so could in theory be nullable,
+but are not nullable in practice. For example, the signature of toLowerCase() is
+
+```scala
+String toLowerCase()
+```
+
+But we know from the (informally specified) semantics of the method that the return type can't be null (more precisely, if the returned value is null, then this signals a bug in the implementation of `toLowerCase`).
+
+However, our Java nullability transform conservatively transforms the above method into
+
+```scala
+def toLowerCase(): String|Null
+```
+
+In order to make the transform more precise, we now use the nullability annotations obtained from the Checker framework: https://github.com/typetools/checker-framework/tree/master/checker/jdk/nullness
+
+The integration works as follows:
+  * we use an offline tool to extract which Java methods and fields in the jdk are non-null: https://github.com/abeln/dotty/blob/explicit-null/explicit-nulls-stdlib.json
+  * at compile time, we feed the information above to our Java null transform so that toLowerCase can have the more precise return type `String`.
+
+Currently, we only use the more precise types in the return type, but not for the argument types. This is because there's at least one test that tries to pass null into a method where the argument shouln't be null according to what the checker framework tells us.
+
+Another limitation of the current approach is that we only use nullability annotations
+from the Checker framework at the top level of a type.
+
+e.g. if the Checker framework says
+
+```scala
+def foo(x: Array[String @NonNull] @NonNull): Unit
+```
+
+that becomes
+
+```scala
+def foo(x: Array[String|Null]): Unit
+```
+
+Notice how only the outermost `|Null` was stripped.
