@@ -51,6 +51,139 @@ e.g.
 [error]    |                           Required: String
 ```
     
+However, there are 114 methods used while bootstrapping that we were able to translate more precisely because of the annotations. We speculate that these result in a small number of errors because of `JavaNull`.
+
+```scala
+>>> valueOf with type (x$0: Double): String
+>>> valueOf with type (x$0: Float): String
+>>> valueOf with type (x$0: Long): String
+>>> valueOf with type (x$0: Int): String
+>>> valueOf with type (x$0: Char): String
+>>> valueOf with type (x$0: Boolean): String
+>>> valueOf with type (x$0: Array[Char], x$1: Int, x$2: Int): String
+>>> valueOf with type (x$0: Array[Char]): String
+>>> valueOf with type (x$0: Any): String
+>>> toGenericString with type (): String
+>>> newInstance with type (): T
+>>> isInstance with type (x$0: Any): Boolean
+>>> isAssignableFrom with type (x$0: Class[_]): Boolean
+>>> isInterface with type (): Boolean
+>>> isArray with type (): Boolean
+>>> isPrimitive with type (): Boolean
+>>> isAnnotation with type (): Boolean
+>>> isSynthetic with type (): Boolean
+>>> getName with type (): String
+>>> getClassLoader0 with type (): ClassLoader
+>>> getTypeParameters with type (): Array[java.lang.reflect.TypeVariable[Class[T]]]
+>>> getInterfaces with type (): Array[Class[_]]
+>>> getGenericInterfaces with type (): Array[java.lang.reflect.Type]
+>>> getModifiers with type (): Int
+>>> getSimpleName with type (): String
+>>> getTypeName with type (): String
+>>> isAnonymousClass with type (): Boolean
+>>> isLocalClass with type (): Boolean
+>>> isMemberClass with type (): Boolean
+>>> getClasses with type (): Array[Class[_]]
+>>> getFields with type (): Array[java.lang.reflect.Field]
+>>> getMethods with type (): Array[java.lang.reflect.Method]
+>>> getConstructors with type (): Array[java.lang.reflect.Constructor[_]]
+>>> getField with type (x$0: String): java.lang.reflect.Field
+>>> getMethod with type (x$0: String, x$1: Class[_]*): java.lang.reflect.Method
+>>> getConstructor with type (x$0: Class[_]*): java.lang.reflect.Constructor[T]
+>>> getDeclaredClasses with type (): Array[Class[_]]
+>>> getDeclaredFields with type (): Array[java.lang.reflect.Field]
+>>> getDeclaredMethods with type (): Array[java.lang.reflect.Method]
+>>> getDeclaredConstructors with type (): Array[java.lang.reflect.Constructor[_]]
+>>> getDeclaredField with type (x$0: String): java.lang.reflect.Field
+>>> getDeclaredMethod with type (x$0: String, x$1: Class[_]*): java.lang.reflect.Method
+>>> getDeclaredConstructor with type (x$0: Class[_]*): java.lang.reflect.Constructor[T]
+>>> getProtectionDomain with type (): java.security.ProtectionDomain
+>>> getRawAnnotations with type (): Array[Byte]
+>>> getRawTypeAnnotations with type (): Array[Byte]
+>>> getConstantPool with type (): sun.reflect.ConstantPool
+>>> desiredAssertionStatus with type (): Boolean
+>>> isEnum with type (): Boolean
+>>> getEnumConstantsShared with type (): Array[T & Object]
+>>> enumConstantDirectory with type (): java.util.Map[String, T]
+>>> asSubclass with type [U](x$0: Class[U]): Class[_ <: U]
+>>> isAnnotationPresent with type (x$0: Class[_ <: java.lang.annotation.Annotation]): Boolean
+>>> getAnnotationsByType with type [A <: java.lang.annotation.Annotation](x$0: Class[A]): Array[A]
+>>> getAnnotations with type (): Array[java.lang.annotation.Annotation]
+>>> getDeclaredAnnotationsByType with type [A <: java.lang.annotation.Annotation](x$0: Class[A]): Array[A]
+>>> getDeclaredAnnotations with type (): Array[java.lang.annotation.Annotation]
+>>> casAnnotationType with type (x$0: sun.reflect.annotation.AnnotationType, x$1:
+  sun.reflect.annotation.AnnotationType
+): Boolean
+>>> getAnnotationType with type (): sun.reflect.annotation.AnnotationType
+>>> getDeclaredAnnotationMap with type ():
+  java.util.Map[Class[_ <: java.lang.annotation.Annotation],
+    java.lang.annotation.Annotation
+  ]
+>>> getAnnotatedSuperclass with type (): java.lang.reflect.AnnotatedType
+>>> getAnnotatedInterfaces with type (): Array[java.lang.reflect.AnnotatedType]
+>>> length with type (): Int
+>>> isEmpty with type (): Boolean
+>>> charAt with type (x$0: Int): Char
+>>> codePointAt with type (x$0: Int): Int
+>>> codePointBefore with type (x$0: Int): Int
+>>> codePointCount with type (x$0: Int, x$1: Int): Int
+>>> offsetByCodePoints with type (x$0: Int, x$1: Int): Int
+>>> getBytes with type (x$0: String): Array[Byte]
+>>> getBytes with type (x$0: java.nio.charset.Charset): Array[Byte]
+>>> getBytes with type (): Array[Byte]
+>>> equals with type (x$0: Any): Boolean
+>>> contentEquals with type (x$0: StringBuffer): Boolean
+>>> contentEquals with type (x$0: CharSequence): Boolean
+>>> equalsIgnoreCase with type (x$0: String): Boolean
+>>> compareTo with type (x$0: String): Int
+>>> compareToIgnoreCase with type (x$0: String): Int
+>>> regionMatches with type (x$0: Int, x$1: String, x$2: Int, x$3: Int): Boolean
+>>> regionMatches with type (x$0: Boolean, x$1: Int, x$2: String, x$3: Int, x$4: Int): Boolean
+>>> startsWith with type (x$0: String, x$1: Int): Boolean
+>>> startsWith with type (x$0: String): Boolean
+>>> endsWith with type (x$0: String): Boolean
+>>> hashCode with type (): Int
+>>> indexOf with type (x$0: Int): Int
+>>> indexOf with type (x$0: Int, x$1: Int): Int
+>>> lastIndexOf with type (x$0: Int): Int
+>>> lastIndexOf with type (x$0: Int, x$1: Int): Int
+>>> indexOf with type (x$0: String): Int
+>>> indexOf with type (x$0: String, x$1: Int): Int
+>>> lastIndexOf with type (x$0: String): Int
+>>> lastIndexOf with type (x$0: String, x$1: Int): Int
+>>> substring with type (x$0: Int): String
+>>> substring with type (x$0: Int, x$1: Int): String
+>>> subSequence with type (x$0: Int, x$1: Int): CharSequence
+>>> concat with type (x$0: String): String
+>>> replace with type (x$0: Char, x$1: Char): String
+>>> matches with type (x$0: String): Boolean
+>>> contains with type (x$0: CharSequence): Boolean
+>>> replaceFirst with type (x$0: String, x$1: String): String
+>>> replaceAll with type (x$0: String, x$1: String): String
+>>> replace with type (x$0: CharSequence, x$1: CharSequence): String
+>>> toLowerCase with type (x$0: java.util.Locale): String
+>>> toLowerCase with type (): String
+>>> toUpperCase with type (x$0: java.util.Locale): String
+>>> toUpperCase with type (): String
+>>> trim with type (): String
+>>> toCharArray with type (): Array[Char]
+>>> intern with type (): String
+>>> compareTo with type (x$0: Any): Int
+>>> compareTo with type (x$0: T): Int
+>>> length with type (): Int
+>>> charAt with type (x$0: Int): Char
+>>> subSequence with type (x$0: Int, x$1: Int): CharSequence
+>>> isAnnotationPresent with type (x$0: Class[_ <: java.lang.annotation.Annotation]): Boolean
+>>> getAnnotations with type (): Array[java.lang.annotation.Annotation]
+>>> getAnnotationsByType with type [T <: java.lang.annotation.Annotation](x$0: Class[T]): Array[T]
+>>> getDeclaredAnnotationsByType with type [T <: java.lang.annotation.Annotation](x$0: Class[T]): Array[T]
+>>> getDeclaredAnnotations with type (): Array[java.lang.annotation.Annotation]
+>>> forName with type (x$0: String): Class[_]
+>>> forName with type (x$0: String, x$1: Boolean, x$2: ClassLoader): Class[_]
+>>> getPrimitiveClass with type (x$0: String): Class[_]
+>>> getExecutableTypeAnnotationBytes with type (x$0: java.lang.reflect.Executable): Array[Byte]
+```
+    
 ## Per-file change stats (sorted)
 `git diff --stat HEAD HEAD^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
 
