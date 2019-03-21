@@ -29,8 +29,8 @@ How we're counting:
     src git:(explicit-null-bootstrap) ✗ cat `ls -d -1 "$PWD/"**/* | grep ".scala"` | wc -l
     117010
     ```
-  * num files changed (via `git diff --stat HEAD HEAD^`): 148
-  * num LOC modified: 3142 (1743 insertions(+), 1399 deletions(-))
+  * num files changed (via `git diff --stat HEAD HEAD^`): *148 (37%)*
+  * num LOC modified: *3142 (3%)* (1743 insertions(+), 1399 deletions(-))
      
     
   
