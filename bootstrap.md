@@ -41,6 +41,9 @@ This document will contain some notes on the experience.
 
 From the checker framework we got nullability annotations exclusively about method and field return types.
 We have annotations for ~ 6232 methods, 1712 fields in 850 classes.
+
+See the annotations file here: https://github.com/abeln/explicit-null-docs/blob/master/explicit-nulls-stdlib.xml
+
 The annotations don't seem to be very useful, however. Disabling the annotations produces just _4_ additional type errors:
 e.g.
 ```scala
