@@ -30,7 +30,7 @@ How we're counting:
     117010
     ```
   * num files changed (via `git diff --stat HEAD HEAD^`): 148
-  * num LOC modified: 3142 1743 insertions(+), 1399 deletions(-)
+  * num LOC modified: 3142 (1743 insertions(+), 1399 deletions(-))
      
     
   
