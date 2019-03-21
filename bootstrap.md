@@ -65,6 +65,12 @@ However, there are 114 methods used while bootstrapping that we were able to tra
 It's also probably the case that I only saw 4 additional errors because the compiler sees the errors and gives up. Often fixing type errors would reveal additional ones.
 
 https://gist.github.com/abeln/36a245f67a519b7318f749811d84e475
+
+## Flow inference
+
+There were 375 `TermRef`s whose type was refined by flow-sensitive type inference (of any kind: within ifs, conditionals, or blocks).
+
+See the list here: https://gist.github.com/abeln/3cdde264692b2ee69ba29da8ee2133bd
     
 ## Per-file change stats (sorted)
 `git diff --stat HEAD HEAD^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
