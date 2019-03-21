@@ -44,7 +44,7 @@ We have annotations for ~ 6232 methods, 1712 fields in 850 classes.
 
 See the annotations file here: https://github.com/abeln/explicit-null-docs/blob/master/explicit-nulls-stdlib.xml
 
-The annotations don't seem to be very useful, however. Disabling the annotations produces just _4_ additional type errors:
+The annotations don't seem to be very useful, however. Disabling the annotations produces just _4_ additional type errors (but see below for why this is probably misleading):
 e.g.
 ```scala
 [error] -- [E007] Type Mismatch Error: /Users/abeln/src/dotty2/dotty/library/src-bootstrapped/scala/reflect/GenericClass.scala:44:46
@@ -55,6 +55,8 @@ e.g.
 ```
     
 However, there are 114 methods used while bootstrapping that we were able to translate more precisely because of the annotations. We speculate that these result in a small number of errors because of `JavaNull`.
+
+It's also probably the case that I only saw 4 additional errors because the compiler sees the errors and gives up. Often fixing type errors would reveal additional ones.
 
 ```scala
 >>> valueOf with type (x$0: Double): String
