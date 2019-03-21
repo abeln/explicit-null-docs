@@ -16,7 +16,7 @@ This document will contain some notes on the experience.
   * num of times we used checker framework info
   * num of nullable fields/arguments/return types
 
-## How we're counting:
+## Easy-to-count stats
   * num of files:
     ```
     src git:(explicit-null-bootstrap) ✗ pwd
@@ -37,6 +37,20 @@ This document will contain some notes on the experience.
     src git:(explicit-null-bootstrap-big) ✗ git grep "\.nn" | wc -l
     914
     ```
+## Using the checker framework info
+
+From the checker framework we got nullability annotations exclusively about method and field return types.
+We have annotations for ~ 6232 methods, 1712 fields in 850 classes.
+The annotations don't seem to be very useful, however. Disabling the annotations produces just _4_ additional type errors:
+e.g.
+```scala
+[error] -- [E007] Type Mismatch Error: /Users/abeln/src/dotty2/dotty/library/src-bootstrapped/scala/reflect/GenericClass.scala:44:46
+[error] 44 |    def addElem = elems += labelsStr.substring(start, cur)
+[error]    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[error]    |                           Found:    String | JavaNull
+[error]    |                           Required: String
+```
+    
 ## Per-file change stats (sorted)
 `git diff --stat HEAD HEAD^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
 
