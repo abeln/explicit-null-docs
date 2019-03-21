@@ -4,14 +4,14 @@ This document will contain some notes on the experience.
 
 Statistics we want to gather:
   * total number of files
-  * # files changed
-  * LOC in dotty
-  * LOC modified
-  * # of `.nn` used
-  * # of usages of `JavaNull`
-  * # of usages of flow inference broken down by type
+  * num files changed
+  * num LOC in dotty
+  * num LOC modified
+  * num of `.nn` used
+  * num of usages of `JavaNull`
+  * num of usages of flow inference broken down by type
     - body of `if` expressions
     - within conditions
     - within blocks
-  * # of times we used checker framework info
-  * # of nullable fields/arguments/return types
+  * num of times we used checker framework info
+  * num of nullable fields/arguments/return types
