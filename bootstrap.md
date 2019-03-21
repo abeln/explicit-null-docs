@@ -37,6 +37,12 @@ This document will contain some notes on the experience.
     src git:(explicit-null-bootstrap-big) ✗ git grep "\.nn" | wc -l
     914
     ```
+    
+## Per-file change stats (sorted)
+`git diff --stat HEAD HEAD^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
+
+See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145    
+   
 ## JavaNull
 
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
@@ -71,8 +77,4 @@ https://gist.github.com/abeln/36a245f67a519b7318f749811d84e475
 There were 375 `TermRef`s whose type was refined by flow-sensitive type inference (of any kind: within ifs, conditionals, or blocks).
 
 See the list here: https://gist.github.com/abeln/3cdde264692b2ee69ba29da8ee2133bd
-    
-## Per-file change stats (sorted)
-`git diff --stat HEAD HEAD^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
-
-See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145
+   
