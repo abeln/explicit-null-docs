@@ -2,7 +2,7 @@ We managed to bootstrap dotty with new explicit nulls type system.
 
 This document will contain some notes on the experience.
 
-Statistics we want to gather:
+## Statistics we want to gather:
   * total number of files
   * num files changed
   * num LOC in dotty
@@ -16,7 +16,7 @@ Statistics we want to gather:
   * num of times we used checker framework info
   * num of nullable fields/arguments/return types
 
-How we're counting:
+## How we're counting:
   * num of files:
     ```
     src git:(explicit-null-bootstrap) ✗ pwd
