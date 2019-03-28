@@ -132,7 +132,32 @@ And `identityHash`, which coems from `Hashable`:
 
 #### 2.2
 
+A bunch of the classes in the file declare state that starts out as `null` (so needs to be declared as nullable).
+e.g. in `MatchType`
+```scala
+-    private[this] var myReduced: Type = null
+-    private[this] var reductionContext: mutable.Map[Type, Type] = null
++    private[this] var myReduced: Nullable[Type] = null
++    private[this] var reductionContext: Nullable[mutable.Map[Type, Type]] = null
+```
 
+This state is not immediately initialized, and is sometimes used depending on complicated logic ():
+```scala
+      record("MatchType.reduce called")
+      if (!Config.cacheMatchReduced || myReduced == null || !upToDate) {
+        record("MatchType.reduce computed")
+        if (myReduced != null) record("MatchType.reduce cache miss")
+        myReduced =
+          trace(i"reduce match type $this $hashCode", typr, show = true) {
+            try
+              if (defn.isBottomType(scrutinee)) defn.NothingType
+              else if (reduceInParallel) reduceParallel(trackingCtx)
+              else reduceSequential(cases)(trackingCtx)
+            catch {
+              case ex: Throwable =>
+                handleRecursive("reduce type ", i"$scrutinee match ...", ex)
+            }
+```
    
 ## JavaNull
 
