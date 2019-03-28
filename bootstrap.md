@@ -113,6 +113,26 @@ So `iso` must also take a nullable second argument.
         myHash = computeHash(null)
         assert(myHash != HashUnknown)
 ```
+
+Similarly, `equalBinder` in BindingType takes a nullable second argument:
+```scala
+-    def equalBinder(that: BindingType, bs: BinderPairs): Boolean =
++    def equalBinder(that: BindingType, bs: Nullable[BinderPairs]): Boolean =
+       (this `eq` that) || bs != null && bs.matches(this, that)
+```
+
+And `identityHash`, which coems from `Hashable`:
+```scala
++    override def identityHash(bs: Nullable[Binders]): Int = {
++      def recur(n: Int, tp: BindingType, rest: Nullable[Binders]): Int =
+         if (this `eq` tp) finishHash(hashing.mix(hashSeed, n), 1)
+         else if (rest == null) System.identityHashCode(this)
+         else recur(n + 1, rest.tp, rest.next)
+```
+
+#### 2.2
+
+
    
 ## JavaNull
 
