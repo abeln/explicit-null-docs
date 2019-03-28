@@ -29,17 +29,17 @@ This document will contain some notes on the experience.
     src git:(explicit-null-bootstrap) ✗ cat `ls -d -1 "$PWD/"**/* | grep ".scala"` | wc -l
     117010
     ```
-  * num files changed (via `git diff --stat HEAD HEAD^`): *148 (37%)*
-  * num LOC modified: *3142 (3%)* (1743 insertions(+), 1399 deletions(-))
+  * num files changed (via `git diff --stat HEAD HEAD^`): *156 (39%)*
+  * num LOC modified: *3188 (2.7%)* (1391 insertions(+), 1797 deletions(-))
   * See per-file stats below
   * usages of `.nn`:
     ```
     src git:(explicit-null-bootstrap-big) ✗ git grep "\.nn" | wc -l
-    914
+    780
     ```
     
 ## Per-file change stats (sorted)
-`git diff --stat HEAD HEAD^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
+`git diff --stat HEAD <commit-before-migration>^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
 
 See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145    
    
