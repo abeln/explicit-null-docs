@@ -33,6 +33,8 @@ Here's a per-file description of what changed in the top 20 files:
 
 ### 1. tools/backend/jvm/{BackendInterface, DottyBackendInterface.scala} (370/1203)
 
+#### 1.1
+
 `BackendInterface` is (surprise) a trait that defined an abstract interface to the backend.
 Specifically, it defined a bunch of abstract type members for each kinds of AST node. In the original code, most of these
 members have `Null` as a lower bound. 
@@ -60,6 +62,8 @@ The corresponding concrete type in `DottyBackendInterface` needs to change as we
 
 Further, these changes propagate through the backend, since every time we have a e.g. `Symbol`, we actually have a `Nullable[Symbols.Symbol]`, so we have to use `.nn`.
 
+#### 1.2
+
 Additionally, this file interacts with the `ASM` java library, which has no annotations (plus, we can't recognize Java annotations yet), so all java methods return nullable values, which then need `.nn`:
 ```scala
 -      val pannVisitor: asm.AnnotationVisitor = jmethod.visitParameterAnnotation(idx, innerClasesStore.typeD
@@ -70,6 +74,8 @@ escriptor(typ.asInstanceOf[bcodeStore.int.Type]), isRuntimeVisible(annot)).nn
 ```
    
 ### 2. dotc/core/Types.scala (208/5330)
+
+#### 2.1
 
 The `equals`, `iso`, and `computeHash` methods in the base `Type` class changed:
 ```scala
