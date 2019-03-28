@@ -247,6 +247,26 @@ There are more examples of this:
          }
 ```
 
+#### 5.0 dotc/sbt/ExtractAPI.scala (86/635)
+
+Around 40 usages of `.nn` in this file come from interactions with Java classes in package `xsbti.api`.
+Examples:
+```scala
+   private def withMarker(tp: api.Type, marker: api.Annotation) =
+-    api.Annotated.of(tp, Array(marker))
++    api.Annotated.of(tp, Array(marker)).nn
+   private def marker(name: String) =
+-    api.Annotation.of(api.Constant.of(Constants.emptyType, name), Array())
++    api.Annotation.of(api.Constant.of(Constants.emptyType, name), Array()).nn
+...
+   def combineApiTypes(apiTps: api.Type*): api.Type = {
+     api.Structure.of(api.SafeLazy.strict(apiTps.toArray),
+-      api.SafeLazy.strict(Array()), api.SafeLazy.strict(Array()))
++      api.SafeLazy.strict(Array()), api.SafeLazy.strict(Array())).nn
+```
+
+All these _could_ be avoided if we could recognize Java annotations _and_ the Java library were annotated.
+
 ## JavaNull
 
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
