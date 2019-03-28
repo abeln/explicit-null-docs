@@ -158,7 +158,38 @@ This state is not immediately initialized, and is sometimes used depending on co
                 handleRecursive("reduce type ", i"$scrutinee match ...", ex)
             }
 ```
-   
+
+### 3. tools/backend/jvm/BCodeSkelBuilder.scala (148/726)
+
+This class exhibits another common pattern: class state that starts out as null, and where the class logic relies on "non-obvious" invariants to make sure things are initialized when needed.
+
+e.g. declared at the top level in the class:
+```scala
+-    var cnode: asm.tree.ClassNode  = null
+-    var thisName: String           = null // the internal name of the class being emitted
++    var cnode: Nullable[asm.tree.ClassNode]  = null
++    var thisName: Nullable[String]           = null // the internal name of the class being emitted
+```
+
+Later, `cnode.nn` is used 13 times throughout the file and `thisName.nn` has 3 matches.
+
+There are other fields declared in this way:
+```scala
+-    var mnode: asm.tree.MethodNode = null
+-    var jMethodName: String        = null
++    var mnode: Nullable[asm.tree.MethodNode] = null
++    var jMethodName: Nullable[String]        = null
+```
+
+There are 14 usages of `mnode.nn`.
+Additionally, because these fields are `var`s, flow inference can't infer a more-precise for them even when checks happen.
+
+Often, the fields are used without any checks:
+```scala
+    // helpers around program-points.
+    def lastInsn: Nullable[asm.tree.AbstractInsnNode] = mnode.nn.instructions.getLast
+```
+
 ## JavaNull
 
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
