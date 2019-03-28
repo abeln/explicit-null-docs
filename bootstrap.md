@@ -28,12 +28,6 @@ This document will contain some notes on the experience.
 `git diff --stat HEAD <commit-before-migration>^|awk '{ print $3 " "$4 " " $1}'| sort -n -r|less | cat`
 
 See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145    
-   
-## JavaNull
-
-I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
-
-There were 896 such instances. See the types that showed up here: https://gist.github.com/abeln/3b709744ccfe13a0065d4f36db35b927 
 
 Here's a per-file description of what changed in the top 20 files:
 
@@ -54,7 +48,33 @@ Since `Null` is no longer a subtype of `AnyRef`, this means the upper bound must
 +  type Type       >: Null <: Nullable[AnyRef]
 ```
 
-    
+The corresponding concrete type in `DottyBackendInterface` needs to change as well, so that the lower bound is satisfied:
+```scala
+-  type Symbol          = Symbols.Symbol
+-  type Type            = Types.Type
+-  type Tree            = tpd.Tree
++  type Symbol          = Nullable[Symbols.Symbol]
++  type Type            = Nullable[Types.Type]
++  type Tree            = Nullable[tpd.Tree]
+```
+
+Further, these changes propagate through the backend, since every time we have a e.g. `Symbol`, we actually have a `Nullable[Symbols.Symbol]`, so we have to use `.nn`.
+
+Additionally, this file interacts with the `ASM` java library, which has no annotations (plus, we can't recognize Java annotations yet), so all java methods return nullable values, which then need `.nn`:
+```scala
+-      val pannVisitor: asm.AnnotationVisitor = jmethod.visitParameterAnnotation(idx, innerClasesStore.typeD
+escriptor(typ.asInstanceOf[bcodeStore.int.Type]), isRuntimeVisible(annot))
++      val pannVisitor: asm.AnnotationVisitor = jmethod.visitParameterAnnotation(idx, innerClasesStore.typeD
+escriptor(typ.asInstanceOf[bcodeStore.int.Type]), isRuntimeVisible(annot)).nn
+       emitAssocs(pannVisitor, assocs, bcodeStore)(innerClasesStore)
+```
+   
+## JavaNull
+
+I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
+
+There were 896 such instances. See the types that showed up here: https://gist.github.com/abeln/3b709744ccfe13a0065d4f36db35b927 
+   
 ## Using the checker framework info
 
 From the checker framework we got nullability annotations exclusively about method and field return types.
