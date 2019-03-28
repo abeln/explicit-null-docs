@@ -34,6 +34,26 @@ See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
 
 There were 896 such instances. See the types that showed up here: https://gist.github.com/abeln/3b709744ccfe13a0065d4f36db35b927 
+
+Here's a per-file description of what changed in the top 20 files:
+
+1. tools/backend/jvm/{BackendInterface, DottyBackendInterface.scala}
+
+`BackendInterface` is (surprise) a trait that defined an abstract interface to the backend.
+Specifically, it defined a bunch of abstract type members for each kinds of AST node. In the original code, most of these
+members have `Null` as a lower bound. 
+
+Since `Null` is no longer a subtype of `AnyRef`, this means the upper bound must change to `Nullable[AnyRef]` (this kind of change where we make the upper bound of an abstract type member nullable re-appears multiple times during the bootstrapping).
+
+```scala
+-  type Constant   >: Null <: AnyRef
+-  type Symbol     >: Null <: AnyRef
+-  type Type       >: Null <: AnyRef
++  type Constant   >: Null <: Nullable[AnyRef]
++  type Symbol     >: Null <: Nullable[AnyRef]
++  type Type       >: Null <: Nullable[AnyRef]
+```
+
     
 ## Using the checker framework info
 
