@@ -366,3 +366,25 @@ def foo(x: Array[String|Null]): Unit
 ```
 
 Notice how only the outermost `|Null` was stripped.
+
+# Java Enums
+
+Instances of Java enums receive special treatment, since they most remain non-nullable.
+
+Example:
+```scala
+// in Java
+public enum Day {
+  MON, TUES, WED
+  Day next() { return null }
+}
+
+// in Scala
+class Foo {
+  val day: Day = Day.MON // notice Day.MON is now non-nullable
+  val next: Day|Null = day.next() // this needs to remain nullable
+}
+```
+
+The fix is https://github.com/abeln/dotty/commit/4835f538feec156fedc55a0476606c92147177de
+This fix was motivated by bootstrapping the "messages.scala" file in the compiler, which makes extensive use of Java enums.
