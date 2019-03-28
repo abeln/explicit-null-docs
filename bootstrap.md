@@ -190,6 +190,63 @@ Often, the fields are used without any checks:
     def lastInsn: Nullable[asm.tree.AbstractInsnNode] = mnode.nn.instructions.getLast
 ```
 
+### 4. dotc/core/Scopes.scala (138/480)
+
+#### 4.1
+
+There are multiple subclasses of `Scope`. `EmptyScope` forces some of the methods in Scope to have nullable return types:
+```scala
+   object EmptyScope extends Scope {
+-    override private[dotc] def lastEntry: ScopeEntry = null
++    override private[dotc] def lastEntry: Nullable[ScopeEntry] = null
+     override def size: Int = 0
+     override def nestingLevel: Int = 0
+     override def toList(implicit ctx: Context): List[Symbol] = Nil
+     override def cloneScope(implicit ctx: Context): MutableScope = unsupported("cloneScope")
+-    override def lookupEntry(name: Name)(implicit ctx: Context): ScopeEntry = null
+-    override def lookupNextEntry(entry: ScopeEntry)(implicit ctx: Context): ScopeEntry = null
++    override def lookupEntry(name: Name)(implicit ctx: Context): Nullable[ScopeEntry] = null
++    override def lookupNextEntry(entry: ScopeEntry)(implicit ctx: Context): Nullable[ScopeEntry] = null
+   }
+```
+
+The other subclasses _also_ use null; it's not just `EmptyScope`.
+
+#### 4.2 Limitation of flow-inference
+
+In the `filter` method of `Scope`:
+```scala
+       var syms: PreDenotation = NoDenotation
+       var e = lookupEntry(name)
+       while (e != null) {
+-        val d = e.sym.denot
++        val d = e.nn.sym.denot
+         if (select(d)) syms = syms union d
+-        e = lookupNextEntry(e)
++        e = lookupNextEntry(e.nn)
+       }
+       syms
+     }
+```
+
+Because the flow inference can't handle `vars`, then we need the `.nn`.
+
+These changes now need to be propagated upstream to `Scope`, and then downstream to all implementers of `Scope`.
+
+There are more examples of this:
+```scala
+-      ensureCapacity(if (hashTable ne null) hashTable.length else MinHashedScopeSize)
++      ensureCapacity(if (hashTable ne null) hashTable.nn.length else MinHashedScopeSize)
+
+-        e = hashTable(name.hashCode & (hashTable.length - 1))
+-        while ((e ne null) && e.name != name) {
+-          e = e.tail
++        e = hashTable.nn(name.hashCode & (hashTable.nn.length - 1))
++        while ((e ne null) && e.nn.name != name) {
++          e = e.nn.tail
+         }
+```
+
 ## JavaNull
 
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
