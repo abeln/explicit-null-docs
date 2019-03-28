@@ -31,7 +31,7 @@ See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145
 
 Here's a per-file description of what changed in the top 20 files:
 
-1. tools/backend/jvm/{BackendInterface, DottyBackendInterface.scala}
+### 1. tools/backend/jvm/{BackendInterface, DottyBackendInterface.scala}
 
 `BackendInterface` is (surprise) a trait that defined an abstract interface to the backend.
 Specifically, it defined a bunch of abstract type members for each kinds of AST node. In the original code, most of these
