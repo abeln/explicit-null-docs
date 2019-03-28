@@ -31,7 +31,7 @@ See stats here: https://gist.github.com/abeln/d0d2979efbf469501923c7d73341e145
 
 Here's a per-file description of what changed in the top 20 files:
 
-### 1. tools/backend/jvm/{BackendInterface, DottyBackendInterface.scala}
+### 1. tools/backend/jvm/{BackendInterface, DottyBackendInterface.scala} (370/1203)
 
 `BackendInterface` is (surprise) a trait that defined an abstract interface to the backend.
 Specifically, it defined a bunch of abstract type members for each kinds of AST node. In the original code, most of these
@@ -67,6 +67,45 @@ escriptor(typ.asInstanceOf[bcodeStore.int.Type]), isRuntimeVisible(annot))
 +      val pannVisitor: asm.AnnotationVisitor = jmethod.visitParameterAnnotation(idx, innerClasesStore.typeD
 escriptor(typ.asInstanceOf[bcodeStore.int.Type]), isRuntimeVisible(annot)).nn
        emitAssocs(pannVisitor, assocs, bcodeStore)(innerClasesStore)
+```
+   
+### 2. dotc/core/Types.scala (208/5330)
+
+The `equals`, `iso`, and `computeHash` methods in the base `Type` class changed:
+```scala
+-    final def equals(that: Any, bs: BinderPairs): Boolean =
++    final def equals(that: Any, bs: Nullable[BinderPairs]): Boolean =
+
+-    protected def iso(that: Any, bs: BinderPairs): Boolean = this.equals(that)
++    protected def iso(that: Any, bs: Nullable[BinderPairs]): Boolean = this.equals(that)
+
+-    final def computeHash(bs: Binders): Int = NotCached
++    override final def computeHash(bs: Nullable[Binders]): Int = NotCached
+```
+
+These are methods that are overriden by many subclasses of types, so the method signature needs to be updated in those as well?
+
+Why did the changes happen? Well, `NamedType` overrides the standard `equals` method (not the one above) as
+```scala
+override def equals(that: Any): Boolean = equals(that, null)
+```
+
+The `equals` on the r.h.s is the method in the base `Type` class. So we know the second argument to `equals` must be nullable. But then `equals` calls `iso` (again, in the base type):
+```scala
+final def equals(that: Any, bs: Nullable[BinderPairs]): Boolean =
+  (this `eq` that.asInstanceOf[AnyRef]) || this.iso(that, bs)
+```
+
+So `iso` must also take a nullable second argument.
+
+`computeHash` is called with null as argument
+```scala
+  abstract class CachedGroundType extends Type with CachedType {
+    private[this] var myHash = HashUnknown
+    final def hash: Int = {
+      if (myHash == HashUnknown) {
+        myHash = computeHash(null)
+        assert(myHash != HashUnknown)
 ```
    
 ## JavaNull
