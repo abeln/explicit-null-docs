@@ -387,7 +387,32 @@ Here again we have class state that starts out as nullable.
 
 Since these are vars, later references always require `.nn`. e.g. `bytecodeWriter` is referenced 9 times later on.
 
-### 9 core/SymDenotations.scala (63/2405)
+### 8 core/SymDenotations.scala (63/2405)
+
+Here, yet again we have mutable class state that starts out as null:
+```scala
+-    private[this] var myTypeParams: List[TypeSymbol] = null
+-    private[this] var fullNameCache: SimpleIdentityMap[QualifiedNameKind, Name] = SimpleIdentityMap.Empty
++    private[this] var myTypeParams: Nullable[List[TypeSymbol]] = null
++    private[this] var fullNameCache: SimpleIdentityMap[QualifiedNameKind, Nullable[Name]] = SimpleIdentityMap.Empty
+
+-    private[this] var myMemberCache: LRUCache[Name, PreDenotation] = null
++    private[this] var myMemberCache: Nullable[LRUCache[Nullable[Name], Nullable[PreDenotation]]] = null
+     private[this] var myMemberCachePeriod: Period = Nowhere
+
+     /** A cache from types T to baseType(T, C) */
+     type BaseTypeMap = java.util.IdentityHashMap[CachedType, Type]
+-    private[this] var myBaseTypeCache: BaseTypeMap = null
++    private[this] var myBaseTypeCache: Nullable[BaseTypeMap] = null
+     private[this] var myBaseTypeCachePeriod: Period = Nowhere
+```
+
+All these need to be referenced with `.nn`, even if we explicitly test for nullability:
+```scala
+-      if (myMemberCache != null) myMemberCache.invalidate(sym.name)
++      if (myMemberCache != null) myMemberCache.nn.invalidate(sym.name)
+       if (!sym.flagsUNSAFE.is(Private)) invalidateMemberNamesCache()
+```
 
 
 
