@@ -387,6 +387,10 @@ Here again we have class state that starts out as nullable.
 
 Since these are vars, later references always require `.nn`. e.g. `bytecodeWriter` is referenced 9 times later on.
 
+### 9 core/SymDenotations.scala (63/2405)
+
+
+
 ## JavaNull
 
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
