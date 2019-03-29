@@ -267,6 +267,70 @@ Examples:
 
 All these _could_ be avoided if we could recognize Java annotations _and_ the Java library were annotated.
 
+#### 6 dotc/util/WeakHashSet.scala (71/406)
+
+The top-level signature of `WeakHashSet` changed:
+```scala
+-final class WeakHashSet[A <: AnyRef](initialCapacity: Int, loadFactor: Double) extends mutable.Set[A] {
++final class WeakHashSet[A >: Null <: Nullable[AnyRef]](initialCapacity: Int, loadFactor: Double) extends m
+utable.Set[A] {
+```
+
+Since `WeakHashSet` is used in the backend, this further requires that changes be propagated through the backend:
+```scala
+backend/jvm/BackendInterface.scala:    def newWeakSet[K >: Null <: AnyRef](): dotty.tools.dotc.util.WeakHashSet[K]
+backend/jvm/DottyBackendInterface.scala:import dotty.tools.dotc.util.WeakHashSet
+backend/jvm/DottyBackendInterface.scala:    def newWeakSet[K >: Null <: AnyRef](): WeakHashSet[K] = new WeakHashSet[K]()
+```
+
+The requirement that `A >: Null` comes from a bunch of places (see `elem match null` and `null.asInstanceOf[A]` below):
+```scala
+  def get(elem: A): Option[A] = Option(findEntry(elem))
+
+  // from scala.reflect.internal.Set, find an element or null if it isn't contained
+  def findEntry(elem: A): A = elem match {
+    case null => throw new NullPointerException("WeakHashSet cannot hold nulls")
+    case _    => {
+      removeStaleEntries()
+      val hash = elem.hashCode
+      val bucket = bucketFor(hash)
+
+      @tailrec
+      def linkedListLoop(entry: Nullable[Entry[A]]): A = entry match {
+        case null                    => null.asInstanceOf[A]
+        case _                       => {
+          val entryElem = entry.nn.get
+          if (elem.equals(entryElem)) entryElem
+          else linkedListLoop(entry.nn.tail)
+        }
+      }
+
+      linkedListLoop(table(bucket))
+    }
+  }
+```
+
+Additional changes are required because flow inference is not smart enough when handling pattern matching:
+```scala
+-      def linkedListLoop(entry: Entry[A]): Unit = entry match {
++      def linkedListLoop(entry: Nullable[Entry[A]]): Unit = entry match {
+         case null                        => add()
+-        case _ if elem.equals(entry.get) => ()
+-        case _                           => linkedListLoop(entry.tail)
++        case _ if elem.equals(entry.nn.get) => ()
++        case _                           => linkedListLoop(entry.nn.tail)
+       }
+```
+
+Notice the `entry.nn` which is required, even though we already handled the `null` case.
+
+Plus, the table entries themselves are nullable:
+```scala
+-  private[this] var table = new Array[Entry[A]](computeCapacity)
++  private[this] var table = new Array[Nullable[Entry[A]]](computeCapacity)
+```
+
+
 ## JavaNull
 
 I instrumented the compiler to log every time a member selection happens on a union with `JavaNull`: e.g. `x.foo` where `x: String|JavaNull`.
