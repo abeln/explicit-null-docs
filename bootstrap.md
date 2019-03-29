@@ -414,7 +414,7 @@ All these need to be referenced with `.nn`, even if we explicitly test for nulla
        if (!sym.flagsUNSAFE.is(Private)) invalidateMemberNamesCache()
 ```
 
-#### 9. dotc/typer/Implicits.scala
+### 9. dotc/typer/Implicits.scala
 
 The changes in this file result from a combination of mutable class state and the fact that a nested context can have an outer context that's null:
 ```scala
@@ -425,6 +425,37 @@ The changes in this file result from a combination of mutable class state and th
  Context) extends ImplicitRefs(initctx) {
 +  class ContextualImplicits(val refs: List[ImplicitRef], val outerImplicits: Nullable[ContextualImplicits]
 )(initctx: Context) extends ImplicitRefs(initctx) {
+```
+
+### 10. dotc/core/TypeComparer.scala
+
+Lots of mutable class state:
+```scala
+-  private[this] var pendingSubTypes: mutable.Set[(Type, Type)] = null
++  private[this] var pendingSubTypes: Nullable[mutable.Set[(Type, Type)]] = null
+   private[this] var recCount = 0
+   private[this] var monitored = false
+
+@@ -56,46 +58,46 @@ class TypeComparer(initctx: Context) extends ConstraintHandling[AbsentContext] {
+   private[this] var successCount = 0
+   private[this] var totalCount = 0
+
+-  private[this] var myAnyClass: ClassSymbol = null
+-  private[this] var myAnyKindClass: ClassSymbol = null
+-  private[this] var myNothingClass: ClassSymbol = null
+-  private[this] var myNullClass: ClassSymbol = null
+-  private[this] var myObjectClass: ClassSymbol = null
+-  private[this] var myAnyType: TypeRef = null
+-  private[this] var myAnyKindType: TypeRef = null
+-  private[this] var myNothingType: TypeRef = null
++  private[this] var myAnyClass: Nullable[ClassSymbol] = null
++  private[this] var myAnyKindClass: Nullable[ClassSymbol] = null
++  private[this] var myNothingClass: Nullable[ClassSymbol] = null
++  private[this] var myNullClass: Nullable[ClassSymbol] = null
++  private[this] var myObjectClass: Nullable[ClassSymbol] = null
++  private[this] var myAnyType: Nullable[TypeRef] = null
++  private[this] var myAnyKindType: Nullable[TypeRef] = null
++  private[this] var myNothingType: Nullable[TypeRef] = null
 ```
 
 ## JavaNull
