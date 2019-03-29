@@ -1,6 +1,25 @@
+# Takeaways from the bootstrapping
+
 We managed to bootstrap dotty with new explicit nulls type system.
 
-This document will contain some notes on the experience.
+Takeaways:
+  1. Dotty uses multiple java libraries, which are currently unannotated. We need to support nullability annotations in Java code (currently unsupported), and annotate the java dependencies of dotty.
+  2. Flow inference should support pattern matching: e.g.
+  ```scala
+  val x: String|Null = ???
+  x match {
+    case null => "dummy"
+    case _ => x // should be x: String
+  }
+  ```
+  and/or
+  ```scala
+  val x: String|Null = ???
+  x match {
+    case null => "dummy"
+    case x1 => x1 // should be x1: String
+  ```
+  3. It'd be nice to redefine certain classes in the compiler (e.g. `BackendInterface`, `WeahHashSet`) to take type parameters that don't have a `Null` lower bound (maybe not possible).
 
 ## Easy-to-count stats
   * num of files:
