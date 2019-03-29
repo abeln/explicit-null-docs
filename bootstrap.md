@@ -330,7 +330,7 @@ Plus, the table entries themselves are nullable:
 +  private[this] var table = new Array[Nullable[Entry[A]]](computeCapacity)
 ```
 
-### backend/jvm/GenBCode.scala (68/574)
+### 7 backend/jvm/GenBCode.scala (68/574)
 
 Here again we have class state that starts out as nullable.
 ```scala
