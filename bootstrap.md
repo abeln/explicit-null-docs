@@ -330,6 +330,17 @@ Plus, the table entries themselves are nullable:
 +  private[this] var table = new Array[Nullable[Entry[A]]](computeCapacity)
 ```
 
+### backend/jvm/GenBCode.scala (68/574)
+
+Here again we have class state that starts out as nullable.
+```scala
+-    private[this] var bytecodeWriter  : BytecodeWriter   = null
+-    private[this] var mirrorCodeGen   : JMirrorBuilder   = null
++    private[this] var bytecodeWriter  : Nullable[BytecodeWriter]   = null
++    private[this] var mirrorCodeGen   : Nullable[JMirrorBuilder]   = null
+```
+
+Since these are vars, later references always require `.nn`. e.g. `bytecodeWriter` is referenced 9 times later on.
 
 ## JavaNull
 
