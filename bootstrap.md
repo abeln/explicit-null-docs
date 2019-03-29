@@ -20,6 +20,32 @@ Takeaways:
     case x1 => x1 // should be x1: String
   ```
   3. It'd be nice to redefine certain classes in the compiler (e.g. `BackendInterface`, `WeahHashSet`) to take type parameters that don't have a `Null` lower bound (maybe not possible).
+  4. The case where a class has state (a `var` field) which is non-null most of the time, but where correctness is ensured through some non-trivial invariant is pretty common (I don't know how to get around this, since flow inference doesn't support `var`s).
+  5. Could we support flow inference for _local_ `vars`? This would also be useful, and is easier (example from `WeakHashSet`):
+  ```scala
+    def fullyValidate(): Unit = {
+      var computedCount = 0
+      var bucket = 0
+      while (bucket < table.size) {
+        var entry = table(bucket)
+        while (entry != null) {
+          assert(entry.nn.get != null, s"$entry had a null value indicated that gc activity was happening during diagnostic validation or that a null value was inserted")
+          computedCount += 1
+          val cachedHash = entry.nn.hash
+          val realHash = entry.nn.get.nn.hashCode
+          assert(cachedHash == realHash, s"for $entry cached hash was $cachedHash but should have been $realHash")
+          val computedBucket = bucketFor(realHash)
+          assert(computedBucket == bucket, s"for $entry the computed bucket was $computedBucket but should have been $bucket")
+
+          entry = entry.nn.tail
+        }
+
+        bucket += 1
+      }
+
+      assert(computedCount == count, s"The computed count was $computedCount but should have been $count")
+    }
+  ```
 
 ## Easy-to-count stats
   * num of files:
