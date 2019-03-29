@@ -292,7 +292,7 @@ There are more examples of this:
          }
 ```
 
-#### 5.0 dotc/sbt/ExtractAPI.scala (86/635)
+#### 5. dotc/sbt/ExtractAPI.scala (86/635)
 
 Around 40 usages of `.nn` in this file come from interactions with Java classes in package `xsbti.api`.
 Examples:
@@ -312,7 +312,7 @@ Examples:
 
 All these _could_ be avoided if we could recognize Java annotations _and_ the Java library were annotated.
 
-#### 6 dotc/util/WeakHashSet.scala (71/406)
+#### 6. dotc/util/WeakHashSet.scala (71/406)
 
 The top-level signature of `WeakHashSet` changed:
 ```scala
@@ -375,7 +375,7 @@ Plus, the table entries themselves are nullable:
 +  private[this] var table = new Array[Nullable[Entry[A]]](computeCapacity)
 ```
 
-### 7 backend/jvm/GenBCode.scala (68/574)
+### 7. backend/jvm/GenBCode.scala (68/574)
 
 Here again we have class state that starts out as nullable.
 ```scala
@@ -387,7 +387,7 @@ Here again we have class state that starts out as nullable.
 
 Since these are vars, later references always require `.nn`. e.g. `bytecodeWriter` is referenced 9 times later on.
 
-### 8 core/SymDenotations.scala (63/2405)
+### 8. core/SymDenotations.scala (63/2405)
 
 Here, yet again we have mutable class state that starts out as null:
 ```scala
@@ -414,7 +414,18 @@ All these need to be referenced with `.nn`, even if we explicitly test for nulla
        if (!sym.flagsUNSAFE.is(Private)) invalidateMemberNamesCache()
 ```
 
+#### 9. dotc/typer/Implicits.scala
 
+The changes in this file result from a combination of mutable class state and the fact that a nested context can have an outer context that's null:
+```scala
+-    private[this] var SingletonClass: ClassSymbol = null
++    private[this] var SingletonClass: Nullable[ClassSymbol] = null
+
+-  class ContextualImplicits(val refs: List[ImplicitRef], val outerImplicits: ContextualImplicits)(initctx:
+ Context) extends ImplicitRefs(initctx) {
++  class ContextualImplicits(val refs: List[ImplicitRef], val outerImplicits: Nullable[ContextualImplicits]
+)(initctx: Context) extends ImplicitRefs(initctx) {
+```
 
 ## JavaNull
 
