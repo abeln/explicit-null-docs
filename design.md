@@ -122,28 +122,28 @@ So far, we have found the following useful:
     ```
     This means that given `x: String|Null`, `x.nn` has type `String`, so we can call all the usual methods
     on it. Of course, `x.nn` will throw a NPE if `x` is `null`.
-  - Implicit conversions from/to nullable arrays
-    ```scala
-    implicit def fromNullable1[T](a: Array[T|Null]): Array[T] = a.asInstanceOf[Array[T]]
-    implicit def toNullable1[T](a: Array[T]): Array[T|Null] = a.asInstanceOf[Array[T|Null]]
-    // similar methods for matrices and higher dimensions: e.g. `toNullable{2, 3, ...}`
-    ```
-    These are useful because Java APIs often return nullable arrays. Additionally, because `Array` is
-    invariant neither `Array[T] <: Array[T|Null]` nor the other way, so to go from one to the other we need
-    casts. For example, suppose we want to write a function that sorts arrays
-    ```scala
-    def sort[T <: AnyRef : Ordering](a: Array[T]): Array[T] = {
-      // error: `copyOf` expects an `Array[T|Null]` and returns an `Array[T|Null]`
-      val a2: Array[T] = java.util.Arrays.copyOf(a, a.length).nn
-      scala.util.Sorting.quickSort(a2)
-      a2
-    }
-    ```    
-    To fix the error we use the implicit conversions above, which turn the third line into
-    ```scala
-    val a2: Array[T] = fromNullable1(java.util.Arrays.copyOf(toNullable1(a), a.length)).nn
-    ```
-    Of course, this is also unsound and `a2` could end up with a `null` value in it.
+  - ~~Implicit conversions from/to nullable arrays~~
+    ~~```scala
+    ~~implicit def fromNullable1[T](a: Array[T|Null]): Array[T] = a.asInstanceOf[Array[T]]
+    ~~implicit def toNullable1[T](a: Array[T]): Array[T|Null] = a.asInstanceOf[Array[T|Null]]
+    ~~// similar methods for matrices and higher dimensions: e.g. `toNullable{2, 3, ...}`
+    ~~```
+    ~~These are useful because Java APIs often return nullable arrays. Additionally, because `Array` is
+    ~~invariant neither `Array[T] <: Array[T|Null]` nor the other way, so to go from one to the other we need
+    ~~casts. For example, suppose we want to write a function that sorts arrays
+    ~~```scala
+    ~~def sort[T <: AnyRef : Ordering](a: Array[T]): Array[T] = {
+    ~~// error: `copyOf` expects an `Array[T|Null]` and returns an `Array[T|Null]`
+    ~~val a2: Array[T] = java.util.Arrays.copyOf(a, a.length).nn
+      ~~scala.util.Sorting.quickSort(a2)
+      ~~a2
+    ~~}
+    ~~```    
+    ~~To fix the error we use the implicit conversions above, which turn the third line into
+    ~~```scala
+    ~~val a2: Array[T] = fromNullable1(java.util.Arrays.copyOf(toNullable1(a), a.length)).nn
+    ~~```
+    ~~Of course, this is also unsound and `a2` could end up with a `null` value in it.
 
 ## Java Interop
 
