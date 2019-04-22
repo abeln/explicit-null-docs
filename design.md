@@ -420,14 +420,14 @@ if (s == null) {
 What exactly is considered a comparison for the purposes of the flow inference:
   - `==` and `!=`
   - `eq` and `ne`
-  - `isInstanceOf[Null]`. Only kicks in if the type test is against `Null`:
-     ```scala
-     val s: String|Null
-     if (!s.isInstanceOf[Null]) {
-       // s: String
-     }
-     ```
-     If the test had been (`if (s.isInstanceOf[String])`), we currently don't infer non-nullness.
+  - ~~`isInstanceOf[Null]`. Only kicks in if the type test is against `Null`:~~
+     ~~```scala~~
+     ~~val s: String|Null~~
+     ~~if (!s.isInstanceOf[Null]) {~~
+       ~~// s: String~~
+     ~~}
+     ~~```~~
+     ~~If the test had been (`if (s.isInstanceOf[String])`), we currently don't infer non-nullness.~~
 
 ### Non-Stable Paths
 If `p` isn't stable, then inferring non-nullness is potentially unsound:
